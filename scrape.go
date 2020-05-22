@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"encoding/json"
 	"fmt"
 
@@ -11,12 +10,10 @@ import (
 const site = "https://twitter.com/i/events/1249735459527254017"
 
 type tweetnews struct {
-	Name string
+	Name     string
 	Username string
-	Message string
-	
+	Message  string
 }
-
 
 func main() {
 	col := colly.NewCollector()
@@ -24,25 +21,24 @@ func main() {
 	messages := []tweetnews{}
 
 	col.OnHTML(".tweetnews", func(e *colly.HTMLElement) {
-		messages = append(messages tweetnews {
-			Name: e.ChildText(".account-group .fullname"),
+		messages = append(messages, tweetnews{
+			Name:     e.ChildText(".account-group .fullname"),
 			Username: e.ChildText(".account-group .username"),
-			Message: e.ChildText(".tweetnews-text")
+			Message:  e.ChildText(".tweetnews-text"),
 		})
 	})
-	
-	checkerror := c.Visit(site)
-	if checkerror != nil {
-		panic(checkerror)
+
+	err := col.Visit(site)
+	if err != nil {
+		panic(err)
 	}
 
 	col.Wait()
 
-	bs, checkerror := json.MarshalIndent(message, "", "\t")
-	if checkerror != nil {
-		panic(checkerror)
+	bs, err := json.MarshalIndent(messages, "", "\t")
+	if err != nil {
+		panic(err)
 	}
-
 
 	fmt.Println(string(bs))
 	fmt.Println("number of tweets:", len(messages))
